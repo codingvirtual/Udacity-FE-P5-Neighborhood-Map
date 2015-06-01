@@ -43,16 +43,31 @@ module.exports = function (grunt) {
                     dest: 'images/'
                 }]
             }
+        },
+        csslint: {
+            strict: {
+                options: {
+                    import: 2
+                },
+                src: ['css/*.css']
+            },
+            lax: {
+                options: {
+                    import: false
+                },
+                src: ['css/*.css']
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-responsive-images');
+    grunt.loadNpmTasks('grunt-contrib-csslint');
 
 // the default task can be run just by typing "grunt" on the command line
-    grunt.registerTask('lint', ['jshint']);
 
+    grunt.registerTask('lint', ['jshint', 'csslint:lax']);
     grunt.registerTask('images', ['responsive_images']);
 };
 
