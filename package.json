@@ -1,0 +1,11 @@
+{
+  "name": "Neighborhood-Map",
+  "version": "0.0.1",
+  "dependencies": {
+    "knockout": "^3.3.0",
+    "grunt-contrib-jshint": "~0.11.2",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-contrib-copy": "~0.8.0",
+    "grunt-responsive-images": "^0.1.6"
+  }
+}
