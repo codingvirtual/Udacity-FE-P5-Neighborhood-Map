@@ -43,17 +43,6 @@ module.exports = function (grunt) {
                     dest: 'images/'
                 }]
             }
-        },
-
-        /* Copy the "fixed" images that don't go through processing into the images/directory */
-        copy: {
-            dev: {
-                files: [{
-                    expand: true,
-                    src: 'images_src/fixed/*.{gif,jpg,png}',
-                    dest: 'images/'
-                }]
-            }
         }
     });
 
