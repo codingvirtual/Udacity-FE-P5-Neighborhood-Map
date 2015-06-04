@@ -1,18 +1,109 @@
 html {
-    max-width: 980px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
 }
 
 body {
     font-family: Roboto, serif;
     font-size: 14px;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 808px;
 }
+
 
 img, embed,
 object, video {
     max-width: 100%;
+}
+
+.titlebar {
+    background-color: blue;
+    color: white;
+    text-align: center;
+}
+
+.content {
+    width: 100%;
+}
+
+.sidebar {
+    background-color: #c2ccd1;
+}
+
+/* Google Map appears in div with this id */
+#map-canvas {
+    min-height: 425px;
+}
+
+.footer {
+    height: 45px;
+    width: 100%;
+}
+
+/* Flex-box/grid system CSS */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/*
+[class*='col-'] {
+}
+*/
+
+.col-1 {
+    width: 8.333%;
+}
+
+.col-2 {
+    width: 16.665%;
+}
+
+.col-3 {
+    width: 25%;
+}
+
+.col-4 {
+    width: 33.333%;
+}
+
+.col-5 {
+    width: 41.665%;
+}
+
+.col-6 {
+    width: 50%;
+}
+
+.col-7 {
+    width: 58.335%;
+}
+
+.col-8 {
+    width: 66.667%;
+}
+
+.col-9 {
+    width: 75%;
+}
+
+.col-10 {
+    width: 83.335%;
+}
+
+.col-11 {
+    width: 91.667%;
+}
+
+.col-12 {
+    width: 100%;
 }

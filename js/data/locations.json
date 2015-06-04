@@ -1,0 +1,8 @@
+{
+  id: 1,
+  name: "Margaritaville",
+  category: "Dining",
+  lat: 36.11709,
+  long: -115.17242,
+  description: "A great drinking establishment"
+}
