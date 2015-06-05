@@ -50,11 +50,8 @@ function populateMarkerObjects(markers) {
     }
 }
 
-function yelp() {
+function yelp(location) {
     var auth = {
-        //
-        // Update with your auth tokens.
-        //
         consumerKey : "vD-WJpgPbOpyvhEDMpt7PA",
         consumerSecret : "qbgNN0ibK48h7XhixYpce9YKVbA",
         accessToken : "81N4jR3e5lxR3lM0C7DzGcU08xdDk2pd",
@@ -66,14 +63,14 @@ function yelp() {
         }
     };
 
-    var terms = 'Margaritaville';
+    var terms = location;
     var near = 'Las+Vegas';
 
     var accessor = {
         consumerSecret : auth.consumerSecret,
         tokenSecret : auth.accessTokenSecret
     };
-    var parameters = [];
+    parameters = [];
     parameters.push(['term', terms]);
     parameters.push(['location', near]);
     parameters.push(['callback', 'cb']);
@@ -92,7 +89,6 @@ function yelp() {
     OAuth.SignatureMethod.sign(message, accessor);
 
     var parameterMap = OAuth.getParameterMap(message.parameters);
-    console.log(parameterMap);
 
     $.ajax({
         'url' : message.action,
@@ -100,8 +96,7 @@ function yelp() {
         'dataType' : 'jsonp',
         'jsonpCallback' : 'cb',
         'success' : function(data, textStats, XMLHttpRequest) {
-            console.log(data);
-            //$("body").append(output);
+            console.log(data.businesses[0]);
         }
     });
 
@@ -190,4 +185,4 @@ function initializeMap() {
 }
 
 // Calls the initializeMap() function when the page loads
-google.maps.event.addDomListener(window, 'load', initializeMap);
+window.addEventListener('load', initializeMap);
