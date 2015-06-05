@@ -23,10 +23,12 @@ object, video {
     background-color: blue;
     color: white;
     text-align: center;
+    height: 270px;
 }
 
 .content {
     width: 100%;
+    min-height: 425px;
 }
 
 ul {
@@ -48,11 +50,6 @@ li {
     background-color: #c2ccd1;
 }
 
-/* Google Map appears in div with this id */
-#map-canvas {
-    min-height: 425px;
-}
-
 .footer {
     height: 45px;
     width: 100%;
@@ -68,6 +65,7 @@ li {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
+    height: 100%;
 }
 
 /*

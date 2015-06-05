@@ -1,8 +1,9 @@
 var map = {};       // declares a global map variable
-function ViewModel (markers) {
+
+function ViewModel(markers) {
     var self = this;
     self.markers = ko.observableArray(markers);
-    self.toggleMarker = function(marker) {
+    self.toggleMarker = function (marker) {
         switch (this.marker.isVisible) {
             case true:
                 this.marker.setMap(null);
@@ -52,14 +53,14 @@ function populateMarkerObjects(markers) {
 
 function yelp(location) {
     var auth = {
-        consumerKey : "vD-WJpgPbOpyvhEDMpt7PA",
-        consumerSecret : "qbgNN0ibK48h7XhixYpce9YKVbA",
-        accessToken : "81N4jR3e5lxR3lM0C7DzGcU08xdDk2pd",
+        consumerKey: "vD-WJpgPbOpyvhEDMpt7PA",
+        consumerSecret: "qbgNN0ibK48h7XhixYpce9YKVbA",
+        accessToken: "81N4jR3e5lxR3lM0C7DzGcU08xdDk2pd",
         // This example is a proof of concept, for how to use the Yelp v2 API with javascript.
         // You wouldn't actually want to expose your access token secret like this in a real application.
-        accessTokenSecret : "tMUB7DAXmwJQoJ97GPur7R3setY",
-        serviceProvider : {
-            signatureMethod : "HMAC-SHA1"
+        accessTokenSecret: "tMUB7DAXmwJQoJ97GPur7R3setY",
+        serviceProvider: {
+            signatureMethod: "HMAC-SHA1"
         }
     };
 
@@ -67,8 +68,8 @@ function yelp(location) {
     var near = 'Las+Vegas';
 
     var accessor = {
-        consumerSecret : auth.consumerSecret,
-        tokenSecret : auth.accessTokenSecret
+        consumerSecret: auth.consumerSecret,
+        tokenSecret: auth.accessTokenSecret
     };
     parameters = [];
     parameters.push(['term', terms]);
@@ -80,9 +81,9 @@ function yelp(location) {
     parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
 
     var message = {
-        'action' : 'http://api.yelp.com/v2/search',
-        'method' : 'GET',
-        'parameters' : parameters
+        'action': 'http://api.yelp.com/v2/search',
+        'method': 'GET',
+        'parameters': parameters
     };
 
     OAuth.setTimestampAndNonce(message);
@@ -91,11 +92,11 @@ function yelp(location) {
     var parameterMap = OAuth.getParameterMap(message.parameters);
 
     $.ajax({
-        'url' : message.action,
-        'data' : parameterMap,
-        'dataType' : 'jsonp',
-        'jsonpCallback' : 'cb',
-        'success' : function(data, textStats, XMLHttpRequest) {
+        'url': message.action,
+        'data': parameterMap,
+        'dataType': 'jsonp',
+        'jsonpCallback': 'cb',
+        'success': function (data, textStats, XMLHttpRequest) {
             console.log(data.businesses[0]);
         }
     });
@@ -104,6 +105,8 @@ function yelp(location) {
 
 // Sets up a new map centered on the Las Vegas Strip
 function initializeMap() {
+
+    resizePanels();
 
     var markers = [];
 
@@ -182,7 +185,17 @@ function initializeMap() {
         ko.applyBindings(new ViewModel(markers));
     }
 
+
+}
+
+function resizePanels() {
+    var contentHeight = window.innerHeight - 315;
+    if (contentHeight >= 425) {
+        $('.content').height(contentHeight);
+        $('#map-canvas').height(contentHeight);
+    }
 }
 
 // Calls the initializeMap() function when the page loads
 window.addEventListener('load', initializeMap);
+window.addEventListener('resize', resizePanels);
