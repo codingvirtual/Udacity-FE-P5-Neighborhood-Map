@@ -43,9 +43,18 @@ li {
     cursor: pointer;
 }
 
+.yelp-quote {
+    font-style: italic
+}
+
 .center {
     text-align: center;
 }
+
+.float-right {
+    float: right;;
+}
+
 .sidebar {
     background-color: #c2ccd1;
 }

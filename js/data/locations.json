@@ -5,6 +5,7 @@
     "category": "Dining",
     "lat": 36.11709,
     "long": -115.17242,
-    "description": "A great drinking establishment"
+    "description": "A great drinking establishment",
+    "isVisible": false
   }
 ]
