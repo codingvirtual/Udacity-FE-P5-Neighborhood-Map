@@ -1,4 +1,4 @@
-var map = {       // declares a global map variable
+var map = {       // declares a global map object
     "googleMap": {},
     "markers": [],
     "currentYelpData": {},
@@ -6,9 +6,7 @@ var map = {       // declares a global map variable
 
     // Sets up a new map centered on the Las Vegas Strip
     "initializeMap": function () {
-        //console.log("Enter initializeMap");
         resizePanels();
-        console.log(map);
 
         var mapOptions = {
             center: {lat: 36.113, lng: -115.172},
@@ -20,7 +18,6 @@ var map = {       // declares a global map variable
         // This next line makes `map` a new Google Map JavaScript Object and attaches it to
         // <div id="map">, which is appended as part of an exercise late in the course.
         map.googleMap = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-        //map.infoWindow = new google.maps.InfoWindow({content: "placeholder"});
         map.readLocations();
     },
 
@@ -50,37 +47,21 @@ var map = {       // declares a global map variable
     },
 
    "populateMarkerObjects": function () {
-        //console.log("Enter populateMarkerObjects");
         for (var element in map.markers) {
             var MapObject = map.markers[element];
             MapObject.marker = map.createMapMarker(MapObject);
             MapObject.marker.isVisible = false;
-            // MapObject.infoWindow = map.createInfoWindow(MapObject);
             google.maps.event.addListener(MapObject.marker, 'click', function () {
                 map.infoWindow.open(map.googleMap);
-                // MapObject.infoWindow.open(map.googleMap, MapObject.marker);
             });
         }
     },
     "createMapMarker": function (marker) {
-        //console.log("Enter createMapMarker");
         // marker is an object with additional data about the pin for a single location
         return new google.maps.Marker({
             position: new google.maps.LatLng(marker.lat, marker.long),
             title: marker.name,
         });
-    },
-    // infoWindows are the little helper windows that open when you click
-    // or hover over a pin on a map. They usually contain more information
-    // about a location.
-    "createInfoWindow": function (mapPoi) {
-        //console.log("Enter createInfoWindow");
-        //return new google.maps.InfoWindow({
-        //    content: map.buildInfoContent(mapPoi)
-        //});
-
-        //map.infoWindow.setContent(mapPoi.name);
-        renderPartial('partials/info-window.html', mapPoi);
     }
 };
 
@@ -89,8 +70,6 @@ var map = {       // declares a global map variable
 function ViewModel(markers) {
     var self = this;
     self.markers = ko.observableArray(markers);
-    //self.markerName = ko.observable(map.currentYelpData.name);
-    self.markerName = ko.observable("test");
     self.filter = ko.observable("");
     self.toggleMarker = function (marker) {
         switch (this.isVisible) {
@@ -101,7 +80,6 @@ function ViewModel(markers) {
             case false:
                 this.marker.setMap(map.googleMap);
                 yelp(this);
-                map.createInfoWindow(this);
                 break;
         }
         this.isVisible = !(this.isVisible);
