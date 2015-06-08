@@ -12,7 +12,7 @@
 </head>
 <body>
 <div class="container">
-    <div class="titlebar">
+    <div class="header">
         <div class="row">
             <div class="col-12">
                 <img src="images/Welcome.jpg" alt="Welcome to Las Vegas sign">
@@ -20,7 +20,7 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <p>Filter: <input type="text" class="search-field"></p>
+                <p>Filter: <input data-bind="textInput: filter"></p>
             </div>
         </div>
     </div>
@@ -39,7 +39,7 @@
             </div>
         </div>
     </div>
-    <div class="footer titlebar">
+    <div class="footer">
         <div class="row">
             <div class="col-12">
                 <p>Neighborhood Map</p>
