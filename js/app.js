@@ -9,16 +9,17 @@ var map = {       // declares a global map variable
         //console.log("Enter initializeMap");
         resizePanels();
         console.log(map);
+
         var mapOptions = {
             center: {lat: 36.113, lng: -115.172},
             zoom: 14,
             disableDefaultUI: true
         };
 
+
         // This next line makes `map` a new Google Map JavaScript Object and attaches it to
         // <div id="map">, which is appended as part of an exercise late in the course.
-        map.googleMap = new google.maps.Map(document.getElementById('map-canvas'),
-            mapOptions);
+        map.googleMap = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
         //map.infoWindow = new google.maps.InfoWindow({content: "placeholder"});
         map.readLocations();
     },
@@ -99,8 +100,8 @@ function ViewModel(markers) {
                 break;
             case false:
                 this.marker.setMap(map.googleMap);
-                map.createInfoWindow(this);
                 yelp(this);
+                map.createInfoWindow(this);
                 break;
         }
         this.isVisible = !(this.isVisible);
@@ -121,7 +122,6 @@ function yelp(marker) {
             signatureMethod: "HMAC-SHA1"
         }
     };
-    console.log(marker);
 
     var accessor = {
         consumerSecret: auth.consumerSecret,
@@ -155,15 +155,7 @@ function yelp(marker) {
         'jsonpCallback': 'cb',
         'success': function (data, textStats, XMLHttpRequest) {
             map.currentYelpData = data.businesses[0];
-            console.log("yelp data received");
-            console.log(map.currentYelpData);
-            //var updatedContent = map.infoWindow.getContent();
-            //updatedContent = '<img src="' +
-            //    data.businesses[0].rating_img_url +
-            //    '" alt="Rating image"><br />' + updatedContent;
-            //updatedContent += "<h3>Latest from Yelp</h3>";
-            //updatedContent += '<p class="yelp-quote">' + data.businesses[0].snippet_text + "</p>";
-            //map.infoWindow.setContent(updatedContent);
+            renderPartial('partials/info-window.html', marker);
         }
     });
 }
@@ -181,18 +173,12 @@ function renderPartial(htmlFragment, poi) {
     $.ajax({
         'url': htmlFragment,
         'success': function(data) {
-            console.log("in render partials");
-            console.log(map.currentYelpData);
             while (!map.currentYelpData) {}
-            console.log("POI is ");
-            console.log(poi);
-            console.log("Yelp is: ");
-            console.log(map.currentYelpData);
             var content = data.replace('--markerDescription--', poi.description);
             content = content.replace('rating_image_url', map.currentYelpData.rating_img_url);
             content = content.replace('poiName', map.currentYelpData.name);
             content = content.replace('image_url', map.currentYelpData.image_url);
-            content = content.replace('yelp_quote', map.currentYelpData.snippet_text);
+            content = content.replace('yelpQuote', map.currentYelpData.snippet_text);
             map.infoWindow.setContent(content);
         }
     });

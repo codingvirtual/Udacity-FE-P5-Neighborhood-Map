@@ -43,6 +43,9 @@ li {
     cursor: pointer;
 }
 
+#infoCanvas {
+    width: 80%;
+}
 .yelp-quote {
     font-style: italic
 }
@@ -52,7 +55,7 @@ li {
 }
 
 .float-right {
-    float: right;;
+    float: right;
 }
 
 .sidebar {
