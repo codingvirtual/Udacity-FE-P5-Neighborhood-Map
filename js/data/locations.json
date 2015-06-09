@@ -5,7 +5,25 @@
     "category": "Dining",
     "lat": 36.11709,
     "long": -115.17242,
-    "description": "Brandon's favorite place to have a Margarita",
+    "description": "A lively place to enjoy a great Margarita or some good food!",
+    "isVisible": false
+  },
+  {
+    "id": 2,
+    "name": "The Cosmopolitan of Las Vegas",
+    "category": "Lodging",
+    "lat": 36.109755,
+    "long": -115.173877,
+    "description": "An ultra-modern hotel in the center of the strip featuring fantastic views from the outdoor balconies.",
+    "isVisible": false
+  },
+  {
+    "id": 3,
+    "name": "McDonalds",
+    "category": "Dining",
+    "lat": 36.1205275,
+    "long": -115.1718501,
+    "description": "McDonald's on the Strip",
     "isVisible": false
   }
 ]

@@ -1,7 +1,7 @@
+var htmlTemplates = [];
 var map = {       // declares a global map object
     "googleMap": {},
     "markers": [],
-    "currentYelpData": {},
     "infoWindow": new google.maps.InfoWindow({content: "placeholder"}),
 
     // Sets up a new map centered on the Las Vegas Strip
@@ -39,32 +39,27 @@ var map = {       // declares a global map object
             //console.log("response received");
             var arr = JSON.parse(response);
             for (var element in arr) {
-                map.markers.push(arr[element]);
+                var location = arr[element];
+                location.marker = map.createMapMarker(location);
+                location.isVisible = false;
+                yelp(location);
+                map.markers.push(location);
             }
-            map.populateMarkerObjects();
             ko.applyBindings(new ViewModel(map.markers));
         }
     },
-
-   "populateMarkerObjects": function () {
-        for (var element in map.markers) {
-            var MapObject = map.markers[element];
-            MapObject.marker = map.createMapMarker(MapObject);
-            MapObject.marker.isVisible = false;
-            google.maps.event.addListener(MapObject.marker, 'click', function () {
-                map.infoWindow.open(map.googleMap);
-            });
-        }
-    },
-    "createMapMarker": function (marker) {
+    "createMapMarker": function (location) {
         // marker is an object with additional data about the pin for a single location
-        return new google.maps.Marker({
-            position: new google.maps.LatLng(marker.lat, marker.long),
-            title: marker.name,
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(location.lat, location.long),
+            title: location.name
         });
+        google.maps.event.addListener(marker, 'click', function () {
+            renderPartial('partials/info-window.html', location);
+        });
+        return marker;
     }
 };
-
 
 
 function ViewModel(markers) {
@@ -79,7 +74,6 @@ function ViewModel(markers) {
                 break;
             case false:
                 this.marker.setMap(map.googleMap);
-                yelp(this);
                 break;
         }
         this.isVisible = !(this.isVisible);
@@ -88,7 +82,8 @@ function ViewModel(markers) {
 }
 
 
-function yelp(marker) {
+function yelp(location) {
+    if (typeof(location.yelpData) != 'undefined') return;
     var auth = {
         consumerKey: "vD-WJpgPbOpyvhEDMpt7PA",
         consumerSecret: "qbgNN0ibK48h7XhixYpce9YKVbA",
@@ -106,7 +101,7 @@ function yelp(marker) {
         tokenSecret: auth.accessTokenSecret
     };
     parameters = [];
-    parameters.push(['term', marker.name]);
+    parameters.push(['term', location.name]);
     parameters.push(['limit', 1]);
     parameters.push(['location', 'Las+Vegas']);
     parameters.push(['callback', 'cb']);
@@ -130,10 +125,9 @@ function yelp(marker) {
         'url': message.action,
         'data': parameterMap,
         'dataType': 'jsonp',
-        'jsonpCallback': 'cb',
+        'jsonpCallback': '',
         'success': function (data, textStats, XMLHttpRequest) {
-            map.currentYelpData = data.businesses[0];
-            renderPartial('partials/info-window.html', marker);
+            location.yelpData = data.businesses[0];
         }
     });
 }
@@ -147,19 +141,40 @@ function resizePanels() {
     }
 }
 
-function renderPartial(htmlFragment, poi) {
-    $.ajax({
-        'url': htmlFragment,
-        'success': function(data) {
-            while (!map.currentYelpData) {}
-            var content = data.replace('--markerDescription--', poi.description);
-            content = content.replace('rating_image_url', map.currentYelpData.rating_img_url);
-            content = content.replace('poiName', map.currentYelpData.name);
-            content = content.replace('image_url', map.currentYelpData.image_url);
-            content = content.replace('yelpQuote', map.currentYelpData.snippet_text);
+
+function renderPartial(htmlFragment, location) {
+    var found = false;
+    for (var i in htmlTemplates) {
+        if (htmlTemplates[i].name === htmlFragment) {
+            var content = htmlTemplates[i].templateText.replace('--markerDescription--', location.description);
+            content = content.replace('rating_image_url', location.yelpData.rating_img_url);
+            content = content.replace('poiName', location.yelpData.name);
+            content = content.replace('image_url', location.yelpData.image_url);
+            content = content.replace('yelpQuote', location.yelpData.snippet_text);
             map.infoWindow.setContent(content);
+            map.infoWindow.open(map.googleMap);
+            found = true;
+            break;
         }
-    });
+    }
+    if (!found) {
+        $.ajax({
+            'url': htmlFragment,
+            'success': function (data) {
+                htmlTemplates.push({
+                    'name': htmlFragment,
+                    'templateText': data
+                });
+                var content = data.replace('--markerDescription--', location.description);
+                content = content.replace('rating_image_url', location.yelpData.rating_img_url);
+                content = content.replace('poiName', location.yelpData.name);
+                content = content.replace('image_url', location.yelpData.image_url);
+                content = content.replace('yelpQuote', location.yelpData.snippet_text);
+                map.infoWindow.setContent(content);
+                map.infoWindow.open(map.googleMap);
+            }
+        });
+    }
 }
 
 // Calls the initializeMap() function when the page loads
