@@ -61,11 +61,17 @@ var map = {       // declares a global map object
     }
 };
 
-
 function ViewModel(markers) {
     var self = this;
-    self.markers = ko.observableArray(markers);
-    self.filter = ko.observable("");
+    // self.markers = ko.observableArray(markers);
+    self.markers = markers;
+    self.filters = ko.observableArray();
+    for (var i in markers) {
+        if (self.filters.indexOf(markers[i].category) < 0) {
+            self.filters.push(markers[i].category);
+        }
+    }
+    self.filters.value = ko.observable();
     self.toggleMarker = function (marker) {
         switch (this.isVisible) {
             case true:

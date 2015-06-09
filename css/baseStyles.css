@@ -55,6 +55,12 @@ li {
     text-align: center;
 }
 
+.filter {
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: bold;
+    font-style: italic;
+}
 .sidebar {
     background-color: #c2ccd1;
 }

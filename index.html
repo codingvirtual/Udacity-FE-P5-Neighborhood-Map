@@ -20,7 +20,12 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <p>Filter: <input data-bind="textInput: filter"></p>
+                <p>Filter:
+                    <select data-bind="options: filters,
+                     value: filters.value,
+                    optionsCaption: 'Show all...'">
+                    </select>
+                </p>
             </div>
         </div>
     </div>
@@ -28,10 +33,12 @@
         <div class="row">
             <div class="sidebar col-3">
                 <p class="center">Points of Interest</p>
+                <p class="filter" data-bind="text: filters.value()"></p>
                 <hr />
 
                 <ul class="loc-list" data-bind="foreach: markers">
-                    <li><a data-bind="text: name, click: $parent.toggleMarker"></a></li>
+                    <li data-bind="if: category == $parent.filters.value()"><a data-bind="text: name, click: $parent.toggleMarker"></a></li>
+                    <li data-bind="if: $parent.filters.value() == undefined"><a data-bind="text: name, click: $parent.toggleMarker"></a></li>
                 </ul>
             </div>
             <div class="col-9">
