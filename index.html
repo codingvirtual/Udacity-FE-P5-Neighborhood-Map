@@ -22,7 +22,7 @@
             <div class="col-12">
                 <p>Filter:
                     <select data-bind="options: filters,
-                     value: filters.value,
+                     value: currentFilter,
                     optionsCaption: 'Show all...'">
                     </select>
                 </p>
@@ -33,12 +33,13 @@
         <div class="row">
             <div class="sidebar col-3">
                 <p class="center">Points of Interest</p>
-                <p class="filter" data-bind="text: filters.value()"></p>
+                <p class="filter" data-bind="text: currentFilter()"></p>
                 <hr />
 
                 <ul class="loc-list" data-bind="foreach: markers">
-                    <li data-bind="if: category == $parent.filters.value()"><a data-bind="text: name, click: $parent.toggleMarker"></a></li>
-                    <li data-bind="if: $parent.filters.value() == undefined"><a data-bind="text: name, click: $parent.toggleMarker"></a></li>
+                    <!-- TODO: remove markers when filter selection changes -->
+                    <li data-bind="if: category == $parent.currentFilter()"><a data-bind="text: name, click: $parent.toggleMarker"></a></li>
+                    <li data-bind="if: $parent.currentFilter() == undefined"><a data-bind="text: name, click: $parent.toggleMarker"></a></li>
                 </ul>
             </div>
             <div class="col-9">

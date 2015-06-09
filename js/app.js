@@ -66,12 +66,12 @@ function ViewModel(markers) {
     // self.markers = ko.observableArray(markers);
     self.markers = markers;
     self.filters = ko.observableArray();
+    self.currentFilter = ko.observable();
     for (var i in markers) {
         if (self.filters.indexOf(markers[i].category) < 0) {
             self.filters.push(markers[i].category);
         }
     }
-    self.filters.value = ko.observable();
     self.toggleMarker = function (marker) {
         switch (this.isVisible) {
             case true:
