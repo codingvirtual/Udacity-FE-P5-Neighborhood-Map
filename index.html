@@ -23,6 +23,7 @@
                 <p>Filter:
                     <select data-bind="options: filters,
                      value: currentFilter,
+                     event: { change: updateMarkers },
                     optionsCaption: 'Show all...'">
                     </select>
                 </p>

@@ -3,38 +3,30 @@ var map = {       // declares a global map object
     "googleMap": {},
     "markers": [],
     "infoWindow": new google.maps.InfoWindow({content: "placeholder"}),
-
     // Sets up a new map centered on the Las Vegas Strip
     "initializeMap": function () {
         resizePanels();
-
         var mapOptions = {
             center: {lat: 36.113, lng: -115.172},
             zoom: 14,
             disableDefaultUI: true
         };
-
-
         // This next line makes `map` a new Google Map JavaScript Object and attaches it to
         // <div id="map">, which is appended as part of an exercise late in the course.
         map.googleMap = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
         map.readLocations();
     },
-
     "readLocations": function () {
         //console.log("Enter readLocations");
         var xmlhttp = new XMLHttpRequest();
         var url = "js/data/locations.json";
-
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 responseFunction(xmlhttp.responseText);
             }
         };
-
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
-
         function responseFunction(response) {
             //console.log("response received");
             var arr = JSON.parse(response);
@@ -60,10 +52,8 @@ var map = {       // declares a global map object
         return marker;
     }
 };
-
 function ViewModel(markers) {
     var self = this;
-    // self.markers = ko.observableArray(markers);
     self.markers = markers;
     self.filters = ko.observableArray();
     self.currentFilter = ko.observable();
@@ -83,11 +73,17 @@ function ViewModel(markers) {
                 break;
         }
         this.isVisible = !(this.isVisible);
+    };
+    self.updateMarkers = function() {
+        map.infoWindow.close();
+        for (var i in self.markers) {
+            if (self.markers[i].category != self.currentFilter()) {
+                self.markers[i].marker.setMap(null);
+            }
+        }
+        return true;
     }
-
 }
-
-
 function yelp(location) {
     if (typeof(location.yelpData) != 'undefined') return;
     var auth = {
@@ -101,7 +97,6 @@ function yelp(location) {
             signatureMethod: "HMAC-SHA1"
         }
     };
-
     var accessor = {
         consumerSecret: auth.consumerSecret,
         tokenSecret: auth.accessTokenSecret
@@ -115,18 +110,14 @@ function yelp(location) {
     parameters.push(['oauth_consumer_secret', auth.consumerSecret]);
     parameters.push(['oauth_token', auth.accessToken]);
     parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
-
     var message = {
         'action': 'http://api.yelp.com/v2/search',
         'method': 'GET',
         'parameters': parameters
     };
-
     OAuth.setTimestampAndNonce(message);
     OAuth.SignatureMethod.sign(message, accessor);
-
     var parameterMap = OAuth.getParameterMap(message.parameters);
-
     $.ajax({
         'url': message.action,
         'data': parameterMap,
@@ -137,8 +128,6 @@ function yelp(location) {
         }
     });
 }
-
-
 function resizePanels() {
     var contentHeight = window.innerHeight - 315;
     if (contentHeight >= 425) {
@@ -146,8 +135,6 @@ function resizePanels() {
         $('#map-canvas').height(contentHeight);
     }
 }
-
-
 function renderPartial(htmlFragment, location) {
     var found = false;
     for (var i in htmlTemplates) {
@@ -182,7 +169,6 @@ function renderPartial(htmlFragment, location) {
         });
     }
 }
-
 // Calls the initializeMap() function when the page loads
 window.addEventListener('load', map.initializeMap);
 window.addEventListener('resize', resizePanels);
