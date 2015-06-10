@@ -34,18 +34,18 @@
         <div class="row">
             <div id="sidebar" class="col-3">
                 <p class="center">Points of Interest</p>
-                <p class="filter" data-bind="text: currentFilter()"></p>
-                <hr />
 
-                <ul class="loc-list" data-bind="foreach: markers">
-                    <!-- TODO: remove markers when filter selection changes -->
-                    <li data-bind="if: category == $parent.currentFilter()">
-                        <a data-bind="text: name, click: $parent.toggleMarker"></a>
-                    </li>
-                    <li data-bind="if: $parent.currentFilter() == undefined">
-                        <a data-bind="text: name, click: $parent.toggleMarker"></a>
-                    </li>
-                </ul>
+                <p class="filter" data-bind="text: currentFilter()"></p>
+                <hr/>
+                    <ul id="locationList" class="loc-list" data-bind="foreach: markers">
+                        <!-- TODO: remove markers when filter selection changes -->
+                        <li data-bind="if: category == $parent.currentFilter()">
+                            <a data-bind="text: name, click: $parent.toggleMarker"></a>
+                        </li>
+                        <li data-bind="if: $parent.currentFilter() == undefined">
+                            <a data-bind="text: name, click: $parent.toggleMarker"></a>
+                        </li>
+                    </ul>
             </div>
             <div class="col-9">
                 <div id="map-canvas"></div>
@@ -60,13 +60,10 @@
         </div>
     </div>
 </div>
-<!--
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-
 <script src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
 <script src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
 <script src="js/vendor/knockout.js"></script>
--->
 <script src="js/app.js"></script>
 </body>
 </html>

@@ -54,8 +54,12 @@ var startup = function () {
                             }
                             ko.applyBindings(new ViewModel(map.locations));
                         },
-                        'complete': function (request, status) {
-                            // check for errors
+                        'error': function (request, status) {
+                            $('#locationList').html("<li>There should have" +
+                                " been a list of locations here, but an " +
+                                "error has occurred reading the locations " +
+                                "data. Please accept our apologies</li>");
+                            alert("no locations found");
                         }
                     });
                 },
@@ -109,7 +113,7 @@ function yelp(location) {
     parameters.push(['limit', 1]);
     parameters.push(['location', 'Las+Vegas']);
     parameters.push(['callback', 'cb']);
-    parameters.push(['oauth_consumer_key', auth.consumerKey]);
+    //parameters.push(['oauth_consumer_key', auth.consumerKey]);
     parameters.push(['oauth_consumer_secret', auth.consumerSecret]);
     parameters.push(['oauth_token', auth.accessToken]);
     parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
@@ -127,9 +131,13 @@ function yelp(location) {
         'dataType': 'jsonp',
         'success': function (data) {
             location.yelpData = data.businesses[0];
+            locaiton.yelpLoaded = true;
         },
         'complete': function (request, status) {
-            // check for errors
+            console.log(status);
+            if (status != 200) {
+                location.yelpLoaded = false;
+            }
         }
     });
 }
@@ -150,57 +158,68 @@ function renderPartial(htmlFragment, location) {
     //      htmlFragment: the url to a partial HTML file that will be used
     //          to render the GoogleMaps InfoWindow for a given location
     //      location: the specific location to use to populate the template with
-    var found = false;
-    for (var i in htmlTemplates) {
-        // loop through the templates to see if the file has already been
-        // read in. This avoids unnecessary network calls to reload the same
-        // template.
-        if (htmlTemplates[i].name === htmlFragment) {
-            // if the above if evaluates to true, it means that the requested
-            // fragment has already been loaded. The next lines copy the template
-            // to a new temporary variable (content) and then replace the
-            // placeholder content with the actual location data that was
-            // retrieved from Yelp earlier.
-            var content = htmlTemplates[i].templateText.replace('--markerDescription--', location.description);
-            content = content.replace('rating_image_url', location.yelpData.rating_img_url);
-            content = content.replace('poiName', location.name);
-            content = content.replace('image_url', location.yelpData.image_url);
-            content = content.replace('yelpQuote', location.yelpData.snippet_text);
-            content = map.infoWindow.setContent(content);
-            map.infoWindow.open(map.googleMap);
-            found = true;   // stops further iteration through templates
-            break;
-        }
-    }
-    if (!found) {
-        // after emerging from the above for/if blocks, the template will
-        // either have been found as already loaded and populated with data
-        // or if not found, it needs to be loaded and then populated. The
-        // code below will go load the fragment if it wasn't found above and
-        // then populate the data to render it.
-        $.ajax({
-            'url': htmlFragment,
-            'success': function (data) {
-                // the AJAX call returned successfully. Push the retrieved
-                // template into the array using the pathname as the name
-                // and the file info as the templateText
-                htmlTemplates.push({
-                    'name': htmlFragment,
-                    'templateText': data
-                });
-                // do the replacement as above.
-                var content = data.replace('--markerDescription--', location.description);
+    console.log(location.yelpLoaded);
+    if (location.yelpLoaded) {
+        var found = false;
+        for (var i in htmlTemplates) {
+            // loop through the templates to see if the file has already been
+            // read in. This avoids unnecessary network calls to reload the same
+            // template.
+            if (htmlTemplates[i].name === htmlFragment) {
+                // if the above if evaluates to true, it means that the requested
+                // fragment has already been loaded. The next lines copy the template
+                // to a new temporary variable (content) and then replace the
+                // placeholder content with the actual location data that was
+                // retrieved from Yelp earlier.
+                var content = htmlTemplates[i].templateText.replace('--markerDescription--', location.description);
                 content = content.replace('rating_image_url', location.yelpData.rating_img_url);
                 content = content.replace('poiName', location.name);
                 content = content.replace('image_url', location.yelpData.image_url);
                 content = content.replace('yelpQuote', location.yelpData.snippet_text);
-                map.infoWindow.setContent(content);
+                content = map.infoWindow.setContent(content);
                 map.infoWindow.open(map.googleMap);
-            },
-            'complete': function (request, status) {
-                // check for errors
+                found = true;   // stops further iteration through templates
+                break;
             }
-        });
+        }
+        if (!found) {
+            // after emerging from the above for/if blocks, the template will
+            // either have been found as already loaded and populated with data
+            // or if not found, it needs to be loaded and then populated. The
+            // code below will go load the fragment if it wasn't found above and
+            // then populate the data to render it.
+            $.ajax({
+                'url': htmlFragment,
+                'success': function (data) {
+                    // the AJAX call returned successfully. Push the retrieved
+                    // template into the array using the pathname as the name
+                    // and the file info as the templateText
+                    htmlTemplates.push({
+                        'name': htmlFragment,
+                        'templateText': data
+                    });
+                    // do the replacement as above.
+                    var content = data.replace('--markerDescription--', location.description);
+                    content = content.replace('rating_image_url', location.yelpData.rating_img_url);
+                    content = content.replace('poiName', location.name);
+                    content = content.replace('image_url', location.yelpData.image_url);
+                    content = content.replace('yelpQuote', location.yelpData.snippet_text);
+                    map.infoWindow.setContent(content);
+                    map.infoWindow.open(map.googleMap);
+                },
+                'complete': function (request, status) {
+                    // check for errors loading fragment
+                }
+            });
+        }
+    } else {
+        map.infoWindow.setContent("<h3>Our sincerely apologies! For " +
+            "some reason, we were unable to retrieve data from Yelp" +
+            " for this informational window. Please check your " +
+            "Internet connect, see if you can get to " +
+            "<a href='http://www.yelp.com'>www.yelp.com</a> " +
+            " and if so, try reloading this page.");
+        map.infoWindow.open(map.googleMap);
     }
 }
 function ViewModel(markers) {   // Knockout ViewModel binding
@@ -259,6 +278,7 @@ function ViewModel(markers) {   // Knockout ViewModel binding
                         // for the event to continue propagating.
     }
 }
+
 // Calls the startup() function when the page loads
 window.addEventListener('load', startup);
 // Calls resizePanels() any time the user resizes the window. Also gets called
