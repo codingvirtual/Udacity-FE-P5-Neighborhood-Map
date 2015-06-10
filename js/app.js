@@ -17,28 +17,22 @@ var map = {       // declares a global map object
         map.readLocations();
     },
     "readLocations": function () {
-        //console.log("Enter readLocations");
-        var xmlhttp = new XMLHttpRequest();
-        var url = "js/data/locations.json";
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                responseFunction(xmlhttp.responseText);
+        $.ajax({
+            'url': 'js/data/locations.json',
+            'success': function (data) {
+                for (var element in data) {
+                    var location = data[element];
+                    location.marker = map.createMapMarker(location);
+                    location.isVisible = false;
+                    yelp(location);
+                    map.markers.push(location);
+                }
+                ko.applyBindings(new ViewModel(map.markers));
+            },
+            'error': function() {
+                window.alert("readLocations failed");
             }
-        };
-        xmlhttp.open("GET", url, true);
-        xmlhttp.send();
-        function responseFunction(response) {
-            //console.log("response received");
-            var arr = JSON.parse(response);
-            for (var element in arr) {
-                var location = arr[element];
-                location.marker = map.createMapMarker(location);
-                location.isVisible = false;
-                yelp(location);
-                map.markers.push(location);
-            }
-            ko.applyBindings(new ViewModel(map.markers));
-        }
+        });
     },
     "createMapMarker": function (location) {
         // marker is an object with additional data about the pin for a single location
@@ -52,6 +46,7 @@ var map = {       // declares a global map object
         return marker;
     }
 };
+
 function ViewModel(markers) {
     var self = this;
     self.markers = markers;
@@ -74,11 +69,12 @@ function ViewModel(markers) {
         }
         this.isVisible = !(this.isVisible);
     };
-    self.updateMarkers = function() {
+    self.updateMarkers = function () {
         map.infoWindow.close();
         for (var i in self.markers) {
             if (self.markers[i].category != self.currentFilter()) {
                 self.markers[i].marker.setMap(null);
+                self.markers[i].isVisible = false;
             }
         }
         return true;
@@ -122,9 +118,11 @@ function yelp(location) {
         'url': message.action,
         'data': parameterMap,
         'dataType': 'jsonp',
-        'jsonpCallback': '',
         'success': function (data, textStats, XMLHttpRequest) {
             location.yelpData = data.businesses[0];
+        },
+        'error': function () {
+            console.log("yelp failed");
         }
     });
 }
@@ -165,6 +163,9 @@ function renderPartial(htmlFragment, location) {
                 content = content.replace('yelpQuote', location.yelpData.snippet_text);
                 map.infoWindow.setContent(content);
                 map.infoWindow.open(map.googleMap);
+            },
+            'error': function() {
+                console.log("renderPartial failed");
             }
         });
     }
