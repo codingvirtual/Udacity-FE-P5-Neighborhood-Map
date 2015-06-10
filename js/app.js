@@ -3,9 +3,8 @@
 // missing libraries more gracefully (in this case, if the libraries are missing,
 // it's likely because the user's Internet connection is down since these
 // libs are loaded from CDN's.
-var htmlTemplates = [];
-var map;
-
+var htmlTemplates = [];         // will hold any partial HTML template files
+var map = {};                   // holds all map-related objects and functions
 var startup = function () {
     var librariesLoaded = function () {
         // This function checks to make sure that all required libraries
@@ -27,7 +26,7 @@ var startup = function () {
             // initialize global variables and start the rest of the app setup
             map = {
                 "googleMap": {},
-                "markers": [],
+                "locations": [],
                 "infoWindow": new google.maps.InfoWindow({content: "placeholder"}),
                 // Sets up a new map centered on the Las Vegas Strip
                 "initializeMap": function () {
@@ -51,9 +50,9 @@ var startup = function () {
                                 location.marker = map.createMapMarker(location);
                                 location.isVisible = false;
                                 yelp(location);
-                                map.markers.push(location);
+                                map.locations.push(location);
                             }
-                            ko.applyBindings(new ViewModel(map.markers));
+                            ko.applyBindings(new ViewModel(map.locations));
                         },
                         'complete': function (request, status) {
                             // check for errors
@@ -82,43 +81,7 @@ var startup = function () {
             break;
     }
 };
-
-
-function ViewModel(markers) {
-    var self = this;
-    self.markers = markers;
-    self.filters = ko.observableArray();
-    self.currentFilter = ko.observable();
-    for (var i in markers) {
-        if (self.filters.indexOf(markers[i].category) < 0) {
-            self.filters.push(markers[i].category);
-        }
-    }
-    self.toggleMarker = function (marker) {
-        switch (this.isVisible) {
-            case true:
-                this.marker.setMap(null);
-                map.infoWindow.close();
-                break;
-            case false:
-                this.marker.setMap(map.googleMap);
-                break;
-        }
-        this.isVisible = !(this.isVisible);
-    };
-    self.updateMarkers = function () {
-        map.infoWindow.close();
-        for (var i in self.markers) {
-            if (self.markers[i].category != self.currentFilter()) {
-                self.markers[i].marker.setMap(null);
-                self.markers[i].isVisible = false;
-            }
-        }
-        return true;
-    }
-}
 function yelp(location) {
-    if (typeof(location.yelpData) != 'undefined') return;
     var auth = {
         consumerKey: "vD-WJpgPbOpyvhEDMpt7PA",
         consumerSecret: "qbgNN0ibK48h7XhixYpce9YKVbA",
@@ -165,41 +128,66 @@ function yelp(location) {
     });
 }
 function resizePanels() {
+    // sets the size of the main content window so that it completely fills
+    // the available viewport/window. 315 is the fixed height of the header
+    // and footer combined, so subtracting that from the window innerHeight
+    // leaves the size of the main content.
     var contentHeight = window.innerHeight - 315;
     if (contentHeight >= 425) {
+        // set both the content div and the map div to this new height
         $('.content').height(contentHeight);
         $('#map-canvas').height(contentHeight);
     }
 }
 function renderPartial(htmlFragment, location) {
+    // this function takes 2 parameters:
+    //      htmlFragment: the url to a partial HTML file that will be used
+    //          to render the GoogleMaps InfoWindow for a given location
+    //      location: the specific location to use to populate the template with
     var found = false;
     for (var i in htmlTemplates) {
+        // loop through the templates to see if the file has already been
+        // read in. This avoids unnecessary network calls to reload the same
+        // template.
         if (htmlTemplates[i].name === htmlFragment) {
-            var content = htmlTemplates[i].templateText;
-            content.replace('--markerDescription--', location.description);
-            content.replace('rating_image_url', location.yelpData.rating_img_url);
-            content.replace('poiName', location.yelpData.name);
-            content.replace('image_url', location.yelpData.image_url);
-            content.replace('yelpQuote', location.yelpData.snippet_text);
-            map.infoWindow.setContent(content);
+            // if the above if evaluates to true, it means that the requested
+            // fragment has already been loaded. The next lines copy the template
+            // to a new temporary variable (content) and then replace the
+            // placeholder content with the actual location data that was
+            // retrieved from Yelp earlier.
+            var content = htmlTemplates[i].templateText.replace('--markerDescription--', location.description);
+            content = content.replace('rating_image_url', location.yelpData.rating_img_url);
+            content = content.replace('poiName', location.name);
+            content = content.replace('image_url', location.yelpData.image_url);
+            content = content.replace('yelpQuote', location.yelpData.snippet_text);
+            content = map.infoWindow.setContent(content);
             map.infoWindow.open(map.googleMap);
-            found = true;
+            found = true;   // stops further iteration through templates
             break;
         }
     }
     if (!found) {
+        // after emerging from the above for/if blocks, the template will
+        // either have been found as already loaded and populated with data
+        // or if not found, it needs to be loaded and then populated. The
+        // code below will go load the fragment if it wasn't found above and
+        // then populate the data to render it.
         $.ajax({
             'url': htmlFragment,
             'success': function (data) {
+                // the AJAX call returned successfully. Push the retrieved
+                // template into the array using the pathname as the name
+                // and the file info as the templateText
                 htmlTemplates.push({
                     'name': htmlFragment,
                     'templateText': data
                 });
+                // do the replacement as above.
                 var content = data.replace('--markerDescription--', location.description);
-                content.replace('rating_image_url', location.yelpData.rating_img_url);
-                content.replace('poiName', location.yelpData.name);
-                content.replace('image_url', location.yelpData.image_url);
-                content.replace('yelpQuote', location.yelpData.snippet_text);
+                content = content.replace('rating_image_url', location.yelpData.rating_img_url);
+                content = content.replace('poiName', location.name);
+                content = content.replace('image_url', location.yelpData.image_url);
+                content = content.replace('yelpQuote', location.yelpData.snippet_text);
                 map.infoWindow.setContent(content);
                 map.infoWindow.open(map.googleMap);
             },
@@ -209,6 +197,64 @@ function renderPartial(htmlFragment, location) {
         });
     }
 }
-// Calls the initializeMap() function when the page loads
+function ViewModel(markers) {   // Knockout ViewModel binding
+    var self = this;
+    self.markers = markers;  // list of locations for the application
+    self.filters = ko.observableArray();    // Holds the list of categories
+                                            // for the Filter drop-down
+    self.currentFilter = ko.observable();   // Holds the current filter choice
+    for (var i in markers) {
+        // this loop sets up the list of choices for the Filter drop down
+        // it checks to see if the category is already in the self.filters
+        // array and if not, adds it. What will result is an array with
+        // each category appearing only once.
+        if (self.filters.indexOf(markers[i].category) < 0) {
+            self.filters.push(markers[i].category);
+        }
+        self.filters.sort();  // sort the categories alphabetically
+    }
+    self.toggleMarker = function (marker) {
+        // this function is called when the user clicks on a location from
+        // the list on the left side of the interface. By default, all
+        // locations are loaded and listed, but no map markers are drawn
+        // initially just to keep the display neat. To make a marker appear,
+        // the user clicks on the location in the list. The clicking functions
+        // as a toggle: if the marker isn't on the map, clicking the location
+        // name makes it show up. If it IS on the map, clicking the location
+        // name makes it go away.
+        switch (this.isVisible) {
+            // if the location's marker is already showing, so remove it
+            case true:
+                this.marker.setMap(null);
+                map.infoWindow.close();
+                break;
+            case false:
+                // marker isn't showing, so show it.
+                this.marker.setMap(map.googleMap);
+                break;
+        }
+        this.isVisible = !(this.isVisible);  // toggle the visibility state
+    };
+    self.updateMarkers = function () {
+        // this function is called when the Filter drop-down is used and a
+        // new filter is chosen. It removes any open infoWindow first.
+        map.infoWindow.close();
+        for (var i in self.markers) {
+            // now iterate through the entire list of locations and hide
+            // any locations that don't match the newly selected category filter
+            if (self.markers[i].category != self.currentFilter()) {
+                // this location's category doesn't match, so remove the marker
+                // from the map and set the visibility state to false.
+                self.markers[i].marker.setMap(null);
+                self.markers[i].isVisible = false;
+            }
+        }
+        return true;    // Knockout requires true to be returned in order
+                        // for the event to continue propagating.
+    }
+}
+// Calls the startup() function when the page loads
 window.addEventListener('load', startup);
+// Calls resizePanels() any time the user resizes the window. Also gets called
+// during the initial startup sequence to size the panels initially.
 window.addEventListener('resize', resizePanels);
