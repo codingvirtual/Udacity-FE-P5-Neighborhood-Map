@@ -74,8 +74,14 @@ var startup = function () {
             map.initializeMap();
             break;
         default:
-            console.log("A required module is missing");
-            window.alert("One or more required software modules are missing." +
+            document.getElementById('sidebar')
+                .innerHTML = "Oops - something has gone wrong!";
+            document.getElementById('map-canvas')
+                .innerHTML = "Regretfully, there has been an error. " +
+                "A necessary software library is not loaded and as a result, " +
+                "this page cannot work properly. Please ensure you have a valid " +
+                "Internet connection and try reloading the page.";
+            window.alert("One or more required software modules are missing. " +
                 "Please ensure you have functioning Internet access and " +
                 "try to reload this page");
             break;
