@@ -113,7 +113,7 @@ function yelp(location) {
     parameters.push(['limit', 1]);
     parameters.push(['location', 'Las+Vegas']);
     parameters.push(['callback', 'cb']);
-    //parameters.push(['oauth_consumer_key', auth.consumerKey]);
+    parameters.push(['oauth_consumer_key', auth.consumerKey]);
     parameters.push(['oauth_consumer_secret', auth.consumerSecret]);
     parameters.push(['oauth_token', auth.accessToken]);
     parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
@@ -131,13 +131,12 @@ function yelp(location) {
         'dataType': 'jsonp',
         'success': function (data) {
             location.yelpData = data.businesses[0];
-            locaiton.yelpLoaded = true;
+            location.yelpLoaded = true;
         },
-        'complete': function (request, status) {
-            console.log(status);
-            if (status != 200) {
-                location.yelpLoaded = false;
-            }
+        'error': function (request, textStatus, errorThrown) {
+            console.log("Error with Yelp call. Error = " +
+                textStatus + ": " + errorThrown);
+            location.yelpLoaded = false;
         }
     });
 }
@@ -158,7 +157,6 @@ function renderPartial(htmlFragment, location) {
     //      htmlFragment: the url to a partial HTML file that will be used
     //          to render the GoogleMaps InfoWindow for a given location
     //      location: the specific location to use to populate the template with
-    console.log(location.yelpLoaded);
     if (location.yelpLoaded) {
         var found = false;
         for (var i in htmlTemplates) {
@@ -207,8 +205,16 @@ function renderPartial(htmlFragment, location) {
                     map.infoWindow.setContent(content);
                     map.infoWindow.open(map.googleMap);
                 },
-                'complete': function (request, status) {
-                    // check for errors loading fragment
+                'error': function (request, textStatus, errorThrown) {
+                    console.log("Error retrieving partials file; Error = " +
+                            textStatus + ": " + errorThrown);
+                    map.infoWindow.setContent("<h3>Our sincerely apologies! For " +
+                        "some reason, we were unable to load a needed file to " +
+                        "display the proper information in this window. " +
+                        "Please check your Internet connection, see if you can " +
+                        "get to " + "<a href='" + htmlFragment + "'>" + htmlFragment +
+                        "</a> and if so, try reloading this page.");
+                    map.infoWindow.open(map.googleMap);
                 }
             });
         }
@@ -217,7 +223,7 @@ function renderPartial(htmlFragment, location) {
             "some reason, we were unable to retrieve data from Yelp" +
             " for this informational window. Please check your " +
             "Internet connect, see if you can get to " +
-            "<a href='http://www.yelp.com'>www.yelp.com</a> " +
+            "<a href='http://api.yelp.com'>api.yelp.com</a> " +
             " and if so, try reloading this page.");
         map.infoWindow.open(map.googleMap);
     }
