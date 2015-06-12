@@ -44,6 +44,22 @@ module.exports = function (grunt) {
                 }]
             }
         },
+        /* Clear out the production directory if it exists */
+        clean: {
+            dev: {
+                src: ['production']
+            }
+        },
+
+        /* Generate the production directory if it is missing */
+        mkdir: {
+            dev: {
+                options: {
+                    create: ['production']
+                }
+            }
+        },
+
         csslint: {
             strict: {
                 options: {
@@ -57,11 +73,31 @@ module.exports = function (grunt) {
                 },
                 src: ['css/*.css']
             }
+        },
+
+        /* Copy the production files to the 'production' directory */
+        copy: {
+            main: {
+                files: [
+                    {
+                        expand: true,
+                        src: ['images/**', 'css/**', 'js/**', 'partials/**'],
+                        dest: 'production/'},
+                    {
+                        expand: true,
+                        src: '*.html',
+                        dest:'production'
+                    }
+                ]
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-mkdir');
     grunt.loadNpmTasks('grunt-responsive-images');
     grunt.loadNpmTasks('grunt-contrib-csslint');
 
@@ -69,6 +105,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('lint', ['jshint', 'csslint:lax']);
     grunt.registerTask('images', ['responsive_images']);
+    grunt.registerTask('produce', ['clean', 'mkdir', 'copy'])
 };
 
 
