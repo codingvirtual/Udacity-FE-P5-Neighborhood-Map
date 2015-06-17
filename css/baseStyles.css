@@ -19,14 +19,13 @@ object, video {
     max-width: 100%;
 }
 
-.header {
+#header {
     background-color: blue;
     color: white;
     text-align: center;
-    height: 270px;
 }
 
-.content {
+#content {
     width: 100%;
     min-height: 425px;
 }
@@ -43,12 +42,13 @@ li {
     cursor: pointer;
 }
 
-#infoCanvas {
-    padding: 5%;
-}
-
 .yelp-quote {
     font-style: italic
+}
+
+.yelp-image {
+    width: 100px;
+    height: 100px;
 }
 
 .center {
@@ -65,7 +65,7 @@ li {
     background-color: #c2ccd1;
 }
 
-.footer {
+#footer {
     background-color: blue;
     color: white;
     text-align: center;
@@ -80,8 +80,10 @@ li {
 }
 
 #map-canvas {
-    height: 425px;
+    height: 100%;
+    width: 100%;
 }
+
 .row {
     display: flex;
     flex-wrap: wrap;

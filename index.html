@@ -12,47 +12,42 @@
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <div class="row">
-            <div class="col-12">
-                <img src="images/Welcome.jpg" alt="Welcome to Las Vegas sign">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <p>Filter:
-                    <select data-bind="options: filters,
+    <div id="header">
+        <img src="images/Welcome.jpg" alt="Welcome to Las Vegas sign">
+        <br/>
+
+        <p>Filter:
+            <select data-bind="options: filters,
                      value: currentFilter,
-                     event: { change: updateMarkers },
+                     event: { change: updateLocList },
                     optionsCaption: 'Show all...'">
-                    </select>
-                </p>
-            </div>
-        </div>
+            </select>
+        </p>
     </div>
-    <div class="content">
+    <div id="content">
         <div class="row">
             <div id="sidebar" class="col-3">
                 <p class="center">Points of Interest</p>
 
                 <p class="filter" data-bind="text: currentFilter()"></p>
                 <hr/>
-                    <ul id="locationList" class="loc-list" data-bind="foreach: markers">
-                        <!-- TODO: remove markers when filter selection changes -->
-                        <li data-bind="if: category == $parent.currentFilter()">
-                            <a data-bind="text: name, click: $parent.toggleMarker"></a>
-                        </li>
-                        <li data-bind="if: $parent.currentFilter() == undefined">
-                            <a data-bind="text: name, click: $parent.toggleMarker"></a>
-                        </li>
-                    </ul>
+                <ul id="locationList" class="loc-list"
+                    data-bind="foreach: locations">
+                    <!-- TODO: remove markers when filter selection changes -->
+                    <li data-bind="if: category == $parent.currentFilter()">
+                        <a data-bind="text: name, click: $parent.toggleMarker"></a>
+                    </li>
+                    <li data-bind="if: $parent.currentFilter() == undefined">
+                        <a data-bind="text: name, click: $parent.toggleMarker"></a>
+                    </li>
+                </ul>
             </div>
             <div class="col-9">
                 <div id="map-canvas"></div>
             </div>
         </div>
     </div>
-    <div class="footer">
+    <div id="footer">
         <div class="row">
             <div class="col-12">
                 <p>Neighborhood Map</p>
