@@ -12,7 +12,7 @@
 </head>
 <body>
 <div class="container">
-    <div id="header">
+    <div id="header" class="header">
         <img src="images/Welcome.jpg" alt="Welcome to Las Vegas sign">
         <br/>
 
@@ -24,16 +24,14 @@
             </select>
         </p>
     </div>
-    <div id="content">
+    <div id="content" class="content">
         <div class="row">
-            <div id="sidebar" class="col-3">
+            <div id="sidebar" class="sidebar col-3">
                 <p class="center">Points of Interest</p>
-
                 <p class="filter" data-bind="text: currentFilter()"></p>
                 <hr/>
                 <ul id="locationList" class="loc-list"
                     data-bind="foreach: locations">
-                    <!-- TODO: remove markers when filter selection changes -->
                     <li data-bind="if: category == $parent.currentFilter()">
                         <a data-bind="text: name, click: $parent.toggleMarker"></a>
                     </li>
@@ -43,11 +41,11 @@
                 </ul>
             </div>
             <div class="col-9">
-                <div id="map-canvas"></div>
+                <div id="map-canvas" class="map-canvas"></div>
             </div>
         </div>
     </div>
-    <div id="footer">
+    <div id="footer" class="footer">
         <div class="row">
             <div class="col-12">
                 <p>Neighborhood Map</p>

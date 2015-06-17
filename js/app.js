@@ -50,8 +50,8 @@ var startup = function () {
                     $.ajax({
                         'url': 'js/data/locations.json',
                         'success': function (data) {
-                            for (var element in data) {
-                                var location = data[element];
+                            for (var i = 0; i < data.length; i++) {
+                                var location = data[i];
                                 location.marker = map.createMapMarker(location);
                                 location.isVisible = false;
                                 yelp(location);
@@ -174,10 +174,21 @@ function resizePanels() {
     // set both the content div and the map div to the calculated height
     $('#content').height(contentHeight);
     $('#map-canvas').height(contentHeight);
-    // redraw infoWindow so it sizes properly
-    var iwWidth = $('#map-canvas').width() - 100;
-    map.infoWindow.setOptions({maxWidth: iwWidth});
-    map.infoWindow.setContent(map.infoWindow.getContent());
+    // If the infoWindow is assigned to a map, it needs to be closed and
+    // re-opened to resize and recenter "responsively" (it won't do this
+    // automatically).
+    if (map.infoWindow.map != null) {
+        // First, capture the current anchor, which is one of the location markers
+        var anchor = map.infoWindow.anchor;
+        map.infoWindow.close();
+        // calculate and adjust the new maxWidth for the infoWindow based on
+        // the overall width of the map canvas minus 100 pixels.
+        var iwWidth = $('#map-canvas').width() - 100;
+        map.infoWindow.setOptions({maxWidth: iwWidth});
+        // now re-open the infoWindow using the previously captured anchor,
+        // which will cause it to auto-pan properly.
+        map.infoWindow.open(map.googleMap, anchor);
+    }
 }
 
 function renderPartial(htmlFragment, location) {
@@ -187,7 +198,7 @@ function renderPartial(htmlFragment, location) {
     //      location: the specific location to use to populate the template with
     if (location.yelpLoaded) {
         var found = false;
-        for (var i in htmlTemplates) {
+        for (var i = 0; i < htmlTemplates.length; i++) {
             // loop through the templates to see if the file has already been
             // read in. This avoids unnecessary network calls to reload the same
             // template.
@@ -270,7 +281,7 @@ function ViewModel(locations) {   // Knockout ViewModel binding
     self.filters = ko.observableArray();    // Holds the list of categories
                                             // for the Filter drop-down
     self.currentFilter = ko.observable();   // Holds the current filter choice
-    for (var i in self.locations) {
+    for (var i = 0; i < self.locations.length; i++) {
         // this loop sets up the list of choices for the Filter drop down
         // it checks to see if the category is already in the self.filters
         // array and if not, adds it. What will result is an array with
@@ -307,7 +318,7 @@ function ViewModel(locations) {   // Knockout ViewModel binding
         // this function is called when the Filter drop-down is used and a
         // new filter is chosen. It removes any open infoWindow first.
         map.infoWindow.close();
-        for (var i in self.locations) {
+        for (var i = 0; i < self.locations.length; i++) {
             // now iterate through the entire list of locations and hide
             // any locations that don't match the newly selected category filter
             if (self.locations[i].category != self.currentFilter()) {
