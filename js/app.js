@@ -30,7 +30,6 @@ var startup = function () {
                 "infoWindow": new google.maps.InfoWindow(),
                 // Sets up a new map centered on the Las Vegas Strip
                 "initializeMap": function () {
-                    resizePanels();  // sets the content panel to fill the viewport
                     var mapOptions = {  // centers on the Las Vegas Strip
                         center: {lat: 36.113, lng: -115.172},
                         zoom: 14,
@@ -58,6 +57,7 @@ var startup = function () {
                                 map.locations.push(location);
                             }
                             ko.applyBindings(new ViewModel(map.locations));
+                            resizePanels();  // sets the content panel to fill the viewport
                         },
                         'error': function (request, status) {
                             $('#locationList').html("<li>There should have" +
@@ -109,6 +109,7 @@ var startup = function () {
     }
 };
 function yelp(location) {
+    "use strict";
     var auth = {
         consumerKey: "vD-WJpgPbOpyvhEDMpt7PA",
         consumerSecret: "qbgNN0ibK48h7XhixYpce9YKVbA",
@@ -125,7 +126,7 @@ function yelp(location) {
         consumerSecret: auth.consumerSecret,
         tokenSecret: auth.accessTokenSecret
     };
-    parameters = [];
+    var parameters = [];
     parameters.push(['term', location.name]);
     parameters.push(['limit', 1]);
     parameters.push(['location', 'Las+Vegas']);
@@ -158,6 +159,7 @@ function yelp(location) {
     });
 }
 function resizePanels() {
+    "use strict";
     // sets the size of the main content window so that it completely fills
     // the available viewport/window. 315 is the fixed height of the header
     // and footer combined, so subtracting that from the window innerHeight
@@ -177,7 +179,7 @@ function resizePanels() {
     // If the infoWindow is assigned to a map, it needs to be closed and
     // re-opened to resize and recenter "responsively" (it won't do this
     // automatically).
-    if (map.infoWindow.map != null) {
+    if (map.infoWindow.map !== null && map.infoWindow.map !== undefined) {
         // First, capture the current anchor, which is one of the location markers
         var anchor = map.infoWindow.anchor;
         map.infoWindow.close();
@@ -192,10 +194,12 @@ function resizePanels() {
 }
 
 function renderPartial(htmlFragment, location) {
+    "use strict";
     // this function takes 2 parameters:
     //      htmlFragment: the url to a partial HTML file that will be used
     //          to render the GoogleMaps InfoWindow for a given location
     //      location: the specific location to use to populate the template with
+    var iwWidth = $('#map-canvas').width() - 100;
     if (location.yelpLoaded) {
         var found = false;
         for (var i = 0; i < htmlTemplates.length; i++) {
@@ -213,7 +217,6 @@ function renderPartial(htmlFragment, location) {
                 content = content.replace('poiName', location.name);
                 content = content.replace('image_url', location.yelpData.image_url);
                 content = content.replace('yelpQuote', location.yelpData.snippet_text);
-                var iwWidth = $('#map-canvas').width() - 100;
                 map.infoWindow.setOptions({maxWidth: iwWidth});
                 map.infoWindow.setContent(content);
                 map.infoWindow.open(map.googleMap, location.marker);
@@ -264,7 +267,6 @@ function renderPartial(htmlFragment, location) {
             });
         }
     } else {
-        var iwWidth = $('#map-canvas').width() - 100;
         map.infoWindow.setOptions({maxWidth: iwWidth});
         map.infoWindow.setContent("<h3>Our sincerely apologies! For " +
             "some reason, we were unable to retrieve data from Yelp" +
@@ -276,6 +278,7 @@ function renderPartial(htmlFragment, location) {
     }
 }
 function ViewModel(locations) {   // Knockout ViewModel binding
+    "use strict";
     var self = this;
     self.locations = locations;  // list of locations for the application
     self.filters = ko.observableArray();    // Holds the list of categories
@@ -330,7 +333,7 @@ function ViewModel(locations) {   // Knockout ViewModel binding
         }
         return true;    // Knockout requires true to be returned in order
                         // for the event to continue propagating.
-    }
+    };
 }
 // Calls the startup() function when the page loads
 window.addEventListener('load', startup);

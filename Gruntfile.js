@@ -105,7 +105,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('lint', ['jshint', 'csslint:lax']);
     grunt.registerTask('images', ['responsive_images']);
-    grunt.registerTask('produce', ['clean', 'mkdir', 'copy'])
+    grunt.registerTask('produce', ['clean', 'mkdir', 'copy']);
 
 };
 
