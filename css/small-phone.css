@@ -1,4 +1,16 @@
 body,
-.location-list {
-    font-size: 10px; !important;
+.location-list{
+    font-size: 10px !important;
+}
+
+p {
+    font-size: 10px;
+}
+
+h2 {
+    font-size: 1.2em;
+}
+
+h3 {
+    font-size: 1.1em;
 }

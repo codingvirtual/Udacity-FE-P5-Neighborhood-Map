@@ -1,4 +1,8 @@
 body,
 .location-list {
-    font-size: 14px; !important;
+    font-size: 14px !important;
+}
+
+p {
+    font-size: 14px;
 }

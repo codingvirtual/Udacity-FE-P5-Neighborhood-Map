@@ -1,4 +1,17 @@
 body,
 .location-list {
-    font-size: 12px; !important;
+    font-size: 12px !important;
+}
+
+p {
+    font-size: 12px;
+}
+
+
+h2 {
+    font-size: 1.35em;
+}
+
+h3 {
+    font-size: 1.15em;
 }
