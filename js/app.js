@@ -36,6 +36,9 @@ var startup = function () {
                         disableDefaultUI: true
                     };
                     map.googleMap = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+                    var controlDiv = document.getElementById('sidebar');
+                    controlDiv.index = 1;
+                    map.googleMap.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
                     map.readLocations();   // reads locations in
                 },
                 "readLocations": function () {
