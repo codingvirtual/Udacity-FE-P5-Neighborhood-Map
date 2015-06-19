@@ -22,21 +22,10 @@ body {
     padding: 0;
 }
 
-.filter {
-    text-align: center;
-    font-weight: bold;
-    font-style: italic;
-}
-
 /* Content-related styles and general styles */
 .content {
     width: 100%;
     margin: 0;
-}
-
-.sidebar {
-    background-color: #c2ccd1;
-    max-width: 225px;
 }
 
 .center {
@@ -61,6 +50,10 @@ p {
     padding: 0.5em 0;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 /* Footer-related styles */
 .footer {
     background-color: blue;
@@ -76,6 +69,19 @@ p {
     margin: 0;
 }
 
+.location-list {
+    background-color: #c2ccd1;
+    padding: 0 10px;
+    max-width: 200px;
+}
+
+.filter {
+    text-align: center;
+    font-weight: bold;
+    font-style: italic;
+    width: 100%;
+}
+
 /* Google Map Info Window Styles */
 .yelp-summary {
     width: 70%;
@@ -83,25 +89,13 @@ p {
     padding-right: 5px;
 }
 
-.row {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-}
-
 .yelp-quote {
     font-style: italic
 }
 
-.yelp-div {
-    float: right;
-    width: 155px;
-    height: 150px
-}
-
 .yelp-image {
-    width: 150px;
-    height: 150px;
+    width: 125px;
+    height: 125px;
 }
 
 /* Responsiveness-related CSS */
@@ -112,4 +106,10 @@ object, video {
 
 .float-right {
     float: right;
+}
+
+.row {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
 }

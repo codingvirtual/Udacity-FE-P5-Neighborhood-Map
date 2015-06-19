@@ -12,8 +12,9 @@ var startup = function () {
         // do indeed yield 'undefined' it means that the respective library
         // failed to load. If it returns 'true', then at least one library
         // was missing.
-        return !(typeof(google) == 'undefined' ||  // google maps API
+        return !(typeof(google) == 'undefined' ||   // google maps API
         typeof($) == 'undefined' ||                 // jQuery
+        typeof($().collapsible) == 'undefined' ||   // jQuery.collapsible
         typeof(ko) == 'undefined' ||                // Knockout
         typeof(OAuth) == 'undefined' ||             // OAuth (required for Yelp)
         typeof(sha1_vm_test) == 'undefined');       // SHA1 (required for Yelp)
@@ -36,7 +37,7 @@ var startup = function () {
                         disableDefaultUI: true
                     };
                     map.googleMap = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-                    var controlDiv = document.getElementById('sidebar');
+                    var controlDiv = document.getElementById('location-list');
                     controlDiv.index = 1;
                     map.googleMap.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
                     map.readLocations();   // reads locations in
@@ -63,6 +64,7 @@ var startup = function () {
                             resizePanels();  // sets the content panel to fill the viewport
                         },
                         'error': function (request, status) {
+                            resizePanels();  // sets the content panel to fill the viewport
                             $('#locationList').html("<li>There should have" +
                                 " been a list of locations here, but an " +
                                 "error has occurred reading the locations " +
@@ -93,12 +95,13 @@ var startup = function () {
                     return marker;
                 }
             };
+            $('#accordion').collapsible();
             map.initializeMap();
             break;
         default:
             // If this code is executing, needed libraries are missing so
             // let the user know. Use native JS methods to do this.
-            document.getElementById('sidebar')
+            document.getElementById('location-list')
                 .innerHTML = "Oops - something has gone wrong!";
             document.getElementById('map-canvas')
                 .innerHTML = "Regretfully, there has been an error. " +
@@ -189,6 +192,7 @@ function resizePanels() {
         // calculate and adjust the new maxWidth for the infoWindow based on
         // the overall width of the map canvas minus 100 pixels.
         var iwWidth = $('#map-canvas').width() - 100;
+        iwWidth = iwWidth > 500 ? 500 : iwWidth;
         map.infoWindow.setOptions({maxWidth: iwWidth});
         // now re-open the infoWindow using the previously captured anchor,
         // which will cause it to auto-pan properly.
@@ -203,6 +207,7 @@ function renderPartial(htmlFragment, location) {
     //          to render the GoogleMaps InfoWindow for a given location
     //      location: the specific location to use to populate the template with
     var iwWidth = $('#map-canvas').width() - 100;
+    iwWidth = iwWidth > 500 ? 500 : iwWidth;
     if (location.yelpLoaded) {
         var found = false;
         for (var i = 0; i < htmlTemplates.length; i++) {
@@ -250,14 +255,16 @@ function renderPartial(htmlFragment, location) {
                     content = content.replace('image_url', location.yelpData.image_url);
                     content = content.replace('yelpQuote', location.yelpData.snippet_text);
                     var iwWidth = $('#map-canvas').width() - 100;
+                    iwWidth = iwWidth > 500 ? 500 : iwWidth;
                     map.infoWindow.setOptions({maxWidth: iwWidth});
                     map.infoWindow.setContent(content);
                     map.infoWindow.open(map.googleMap, location.marker);
                 },
                 'error': function (request, textStatus, errorThrown) {
                     console.log("Error retrieving partials file; Error = " +
-                            textStatus + ": " + errorThrown);
+                        textStatus + ": " + errorThrown);
                     var iwWidth = $('#map-canvas').width() - 100;
+                    iwWidth = iwWidth > 500 ? 500 : iwWidth;
                     map.infoWindow.setOptions({maxWidth: iwWidth});
                     map.infoWindow.setContent("<h3>Our sincerely apologies! For " +
                         "some reason, we were unable to load a needed file to " +
@@ -286,7 +293,11 @@ function ViewModel(locations) {   // Knockout ViewModel binding
     self.locations = locations;  // list of locations for the application
     self.filters = ko.observableArray();    // Holds the list of categories
                                             // for the Filter drop-down
+
     self.currentFilter = ko.observable();   // Holds the current filter choice
+    self.filterHeading = function () {
+        return self.currentFilter() === undefined ? "All Points of Interest" : self.currentFilter();
+    };
     for (var i = 0; i < self.locations.length; i++) {
         // this loop sets up the list of choices for the Filter drop down
         // it checks to see if the category is already in the self.filters

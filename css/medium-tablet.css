@@ -1,3 +1,4 @@
-body {
-    font-size: 12px;
+body,
+.location-list {
+    font-size: 12px; !important;
 }

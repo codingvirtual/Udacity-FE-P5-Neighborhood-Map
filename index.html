@@ -23,26 +23,28 @@
     </div>
     <div id="content" class="content">
         <div id="map-canvas" class="map-canvas"></div>
-        <div id="sidebar" class="sidebar">
-            <p>
-                <select data-bind="options: filters,
+        <div id="location-list" class="location-list">
+            <div id="accordion">
+                <h2 class="filter pointer" data-bind="text: filterHeading()">
+                </h2>
+
+                <div class="filter">
+                    <select data-bind="options: filters,
                      value: currentFilter,
                      event: { change: updateLocList },
                     optionsCaption: 'Show all...'">
-                </select>
-            </p>
-
-            <p class="filter" data-bind="text: currentFilter()"></p>
-            <hr/>
-            <ul id="locationList" class="loc-list"
-                data-bind="foreach: locations">
-                <li data-bind="if: category == $parent.currentFilter()">
-                    <a data-bind="text: name, click: $parent.toggleMarker"></a>
-                </li>
-                <li data-bind="if: $parent.currentFilter() == undefined">
-                    <a data-bind="text: name, click: $parent.toggleMarker"></a>
-                </li>
-            </ul>
+                    </select>
+                    <ul id="locationList" class="loc-list"
+                        data-bind="foreach: locations">
+                        <li data-bind="if: category == $parent.currentFilter()">
+                            <a data-bind="text: name, click: $parent.toggleMarker"></a>
+                        </li>
+                        <li data-bind="if: $parent.currentFilter() == undefined">
+                            <a data-bind="text: name, click: $parent.toggleMarker"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
     <div id="footer" class="footer">
